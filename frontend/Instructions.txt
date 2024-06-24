@@ -1,0 +1,143 @@
+
+1. CREATE REACT PROJECT, VITE, TAILWIND CSS
+
+
+npm create vite @latest
+project name: frontend
+framework: React
+variant: javascript.
+cd frontend
+
+tailwind:
+visit tailwind.css
+vite framework-> npm install tailwind css, npm tailwindcss init -p.
+copy files in website and modify index.css and tailwind config.js.
+_________________________________________________________________________________________________________________
+
+2. SPA AND ADD REACT ROUTER DOM
+
+npm i react-router-dom.
+
+main.jsx
+--------
+
+import { BrowserRouter } from "react-router-dom";
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <BrowserRouter>
+      <App />
+  </BrowserRouter>
+);
+
+//BrowserRouter - SPA(Single Page application) wont be refreshing while page changing, functionality in react itself is react-router dom.
+
+App.jsx
+*******
+
+create separate components for home,create,show,edit and delete in a pages folder.
+add routes, route from react-router-dom.
+
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import CreateBook from "./pages/CreateBook";
+import ShowBook from "./pages/ShowBook";
+import EditBook from "./pages/EditBook";
+import DeleteBook from "./pages/DeleteBook";
+const App = () => {
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/books/create" element={<CreateBook />} />
+      <Route path="/books/details/:id" element={<ShowBook />} />
+      <Route path="/books/edit/:id" element={<EditBook />} />
+      <Route path="/books/delete/:id" element={<DeleteBook />} />
+    </Routes>
+  );
+};
+
+export default App;
+
+_________________________________________________________________________________________________________________
+
+3.SHOW BOOKS LIST IN A REACT
+
+create a component folder, add spinner.jsx file in it- while loading a spinner occur.
+
+Home.jsx
+********
+{loading ? (
+        <Spinner />
+      ) : showType === "table" ? (
+        <BooksTable books={books} />
+      ) : (
+        <BooksCard books={books} />
+      )}
+
+If loading is true, a <Spinner /> is shown.
+If loading is false and showType is "table", a <BooksTable /> component is rendered with books as its prop.
+If loading is false and showType is not "table", a <BooksCard /> component is rendered with books as its prop.
+
+
+ useEffect(() => {
+    setLoading(true);
+    axios
+      .get("http://localhost:5555/books")
+      .then((response) => {
+        setBooks(response.data.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.log(error);
+        setLoading(false);
+      });
+  }, []);
+
+
+useEffect(() => { ... }, []);
+//The useEffect hook is used here with an empty dependency array ([]), which means it will execute the callback function (() => { ... }) only once after the component is mounted. This is typical for fetching initial data when the component first appears.
+
+setLoading(true);
+//This sets the loading state to true initially, indicating that data fetching is in progress.
+
+axios.get("http://localhost:5555/books"):
+//This line uses Axios, a popular library for making HTTP requests, to send a GET request to http://localhost:5555/books. It expects to receive a JSON response with data.
+
+.then((response) => { ... }):
+If the request is successful (then block), the response object contains the data returned from the server.
+
+setBooks(response.data.data); 
+//updates the books state with the data received from the server. This assumes that the server responds with an object containing a data property that holds the actual books data.
+
+setLoading(false); 
+//sets the loading state to false after successfully fetching and updating the books state. This indicates that data fetching is complete.
+
+.catch((error) => { ... }):
+If an error occurs during the HTTP request (catch block), it logs the error to the console for debugging purposes.
+Regardless of whether the request succeeds or fails, setLoading(false); is called in the catch block to ensure that the loading state is set to false after the request completes (whether successfully or with an error).
+______________________________________________________________________________________________________________________________________________________
+
+SHOW BOOK DETAILS IN REACT.
+
+ShowBook.js
+
+const ShowBook = () => {
+  const [book, setBook] = useState({});
+  const [loading, setLoading] = useState(false);
+  const { id } = useParams();
+
+  useEffect(() => {
+    setLoading(true);
+    axios
+      .get(`http://localhost:5555/books/${id}`)
+      .then((response) => {
+        setBook(response.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.log(error);
+        setLoading(false);'
+      });
+  }, []);
+
+When your application navigates to a URL matching /users/123, for example, useParams() in the UserDetail component will return an object { id: '123' }. The line of code const { id } = useParams(); extracts the id parameter from this object.
